@@ -23,19 +23,19 @@ typedef struct hname_t {
 
 
 /*
-  список адресов NTP
+  СЃРїРёСЃРѕРє Р°РґСЂРµСЃРѕРІ NTP
 */
 HOSTNAME *hostList = NULL;
 
 /*
-  задержка на старте и на выходе, в мсек
+  Р·Р°РґРµСЂР¶РєР° РЅР° СЃС‚Р°СЂС‚Рµ Рё РЅР° РІС‹С…РѕРґРµ, РІ РјСЃРµРє
 */
 unsigned int startWait = 0;
 unsigned int finishWait = 0;
 
 /*
-  при какой разнице происходит корректировка времени
-  по умолчанию = 2 min
+  РїСЂРё РєР°РєРѕР№ СЂР°Р·РЅРёС†Рµ РїСЂРѕРёСЃС…РѕРґРёС‚ РєРѕСЂСЂРµРєС‚РёСЂРѕРІРєР° РІСЂРµРјРµРЅРё
+  РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ = 2 min
 */
 int diffTime = 60*2;
 
@@ -48,7 +48,7 @@ void wsa_error(char *func)
 
 
 /*
-  удаляет из ip-адреса незначащие нули
+  СѓРґР°Р»СЏРµС‚ РёР· ip-Р°РґСЂРµСЃР° РЅРµР·РЅР°С‡Р°С‰РёРµ РЅСѓР»Рё
 */
 int normalize_ip4(char *str, char *out)
 {
@@ -79,7 +79,7 @@ int normalize_ip4(char *str, char *out)
             return 0;
         if (cnt < 4)
             strcat(res, ".");
-        // к следующему номеру
+        // Рє СЃР»РµРґСѓСЋС‰РµРјСѓ РЅРѕРјРµСЂСѓ
         pos = strtok(NULL, ".");
     }
     return -1;
@@ -87,41 +87,41 @@ int normalize_ip4(char *str, char *out)
 
 
 /*
-  проверка строки на соответствие IP-адресу
+  РїСЂРѕРІРµСЂРєР° СЃС‚СЂРѕРєРё РЅР° СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ IP-Р°РґСЂРµСЃСѓ
 */
 int validate_ip4(char *s)
 {
-    char tail[16];              // сюда скинется всё лишнее
-    char norm[16];              // номализованный адрес
+    char tail[16];              // СЃСЋРґР° СЃРєРёРЅРµС‚СЃСЏ РІСЃС‘ Р»РёС€РЅРµРµ
+    char norm[16];              // РЅРѕРјР°Р»РёР·РѕРІР°РЅРЅС‹Р№ Р°РґСЂРµСЃ
     char tmp[16];
     unsigned int digit[4];
     int cnt;
 
-    // проверяем длину строки
+    // РїСЂРѕРІРµСЂСЏРµРј РґР»РёРЅСѓ СЃС‚СЂРѕРєРё
     cnt = strlen(s);
     if (cnt < 7 || cnt > 15)
         return 0;
 
-    // убираем возможные незначащие нули в адресе
+    // СѓР±РёСЂР°РµРј РІРѕР·РјРѕР¶РЅС‹Рµ РЅРµР·РЅР°С‡Р°С‰РёРµ РЅСѓР»Рё РІ Р°РґСЂРµСЃРµ
     if (normalize_ip4(s, &norm) == 0)
         return 0;
-    // раскладываем строку на отдельные числа
+    // СЂР°СЃРєР»Р°РґС‹РІР°РµРј СЃС‚СЂРѕРєСѓ РЅР° РѕС‚РґРµР»СЊРЅС‹Рµ С‡РёСЃР»Р°
     tail[0] = 0;
     cnt = sscanf(norm, "%3u.%3u.%3u.%3u%s", &digit[0], &digit[1], &digit[2], &digit[3], tail);
-    if (cnt != 4 || tail[0]) // в tail[] будет то, что не вписалось в трафарет
+    if (cnt != 4 || tail[0]) // РІ tail[] Р±СѓРґРµС‚ С‚Рѕ, С‡С‚Рѕ РЅРµ РІРїРёСЃР°Р»РѕСЃСЊ РІ С‚СЂР°С„Р°СЂРµС‚
         return 0;
-    // проверяем на допустимый диапазон [0..255]
+    // РїСЂРѕРІРµСЂСЏРµРј РЅР° РґРѕРїСѓСЃС‚РёРјС‹Р№ РґРёР°РїР°Р·РѕРЅ [0..255]
     for (cnt = 0; cnt < 4; cnt++)
         if (digit[cnt] > 255)
             return 0;
-    // собираем строку обратно
+    // СЃРѕР±РёСЂР°РµРј СЃС‚СЂРѕРєСѓ РѕР±СЂР°С‚РЅРѕ
     snprintf(tmp, 16, "%u.%u.%u.%u", digit[0], digit[1], digit[2], digit[3]);
-    // если в ней были символы, кроме цифр, то собранный образец
-    // не совпадет с начальным
+    // РµСЃР»Рё РІ РЅРµР№ Р±С‹Р»Рё СЃРёРјРІРѕР»С‹, РєСЂРѕРјРµ С†РёС„СЂ, С‚Рѕ СЃРѕР±СЂР°РЅРЅС‹Р№ РѕР±СЂР°Р·РµС†
+    // РЅРµ СЃРѕРІРїР°РґРµС‚ СЃ РЅР°С‡Р°Р»СЊРЅС‹Рј
     if (strcmp(norm, tmp) != 0)
         return 0;
 
-    // сохраняем результат
+    // СЃРѕС…СЂР°РЅСЏРµРј СЂРµР·СѓР»СЊС‚Р°С‚
     strcpy(s, norm);
     return 1;
 }
@@ -129,8 +129,8 @@ int validate_ip4(char *s)
 
 
 /*
-  подгружает настройки и адреса серверов NTP
-  из TIMENTP.INI
+  РїРѕРґРіСЂСѓР¶Р°РµС‚ РЅР°СЃС‚СЂРѕР№РєРё Рё Р°РґСЂРµСЃР° СЃРµСЂРІРµСЂРѕРІ NTP
+  РёР· TIMENTP.INI
 */
 void load_config(void)
 {
@@ -143,12 +143,12 @@ void load_config(void)
     DWORD res;
     HOSTNAME *curIP;
 
-    // сначала инициализируем список адресов дефолтным значением
+    // СЃРЅР°С‡Р°Р»Р° РёРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј СЃРїРёСЃРѕРє Р°РґСЂРµСЃРѕРІ РґРµС„РѕР»С‚РЅС‹Рј Р·РЅР°С‡РµРЅРёРµРј
     hostList = malloc(sizeof(HOSTNAME));
     strcpy(&hostList->name, "200.20.186.76");
     hostList->next = NULL;
 
-    // получем путь к INI-файлу
+    // РїРѕР»СѓС‡РµРј РїСѓС‚СЊ Рє INI-С„Р°Р№Р»Сѓ
     GetModuleFileName(NULL, szIniPath, sizeof(szIniPath));
     pos = strrchr(szIniPath, '\\');
     if (*pos == '\\')
@@ -162,7 +162,7 @@ void load_config(void)
     strcat(szIniPath, "timentp.ini");
 
     /*
-      считываем время задержек
+      СЃС‡РёС‚С‹РІР°РµРј РІСЂРµРјСЏ Р·Р°РґРµСЂР¶РµРє
     */
     res = GetPrivateProfileString("DELAY", "StartWait", "", &szKeys, sizeof(szKeys), szIniPath);
     if (res)
@@ -182,7 +182,7 @@ void load_config(void)
     }
 
     /*
-      считываем управляющие ключи
+      СЃС‡РёС‚С‹РІР°РµРј СѓРїСЂР°РІР»СЏСЋС‰РёРµ РєР»СЋС‡Рё
     */
     res = GetPrivateProfileString("COMMAND", "DiffTime", "", &szKeys, sizeof(szKeys), szIniPath);
     if (res)
@@ -191,14 +191,14 @@ void load_config(void)
             diffTime = atoi(szKeys);
     }
     /*
-      получаем список всех ключей в разделе [HOST]
+      РїРѕР»СѓС‡Р°РµРј СЃРїРёСЃРѕРє РІСЃРµС… РєР»СЋС‡РµР№ РІ СЂР°Р·РґРµР»Рµ [HOST]
     */
     memset(szKeys, 0, sizeof(szKeys));
     res = GetPrivateProfileString("HOST", NULL, "", &szKeys, sizeof(szKeys), szIniPath);
     if (res == 0)
         return;
     /*
-      нашли что-то, и теперь проходимся по найденным ключам
+      РЅР°С€Р»Рё С‡С‚Рѕ-С‚Рѕ, Рё С‚РµРїРµСЂСЊ РїСЂРѕС…РѕРґРёРјСЃСЏ РїРѕ РЅР°Р№РґРµРЅРЅС‹Рј РєР»СЋС‡Р°Рј
     */
     pos = &szKeys;
     curIP = hostList;
@@ -208,10 +208,10 @@ void load_config(void)
         {
             if (strlen(szHostName) > 0)
             {
-                // ключ не пустой, добавляем адрес хоста
+                // РєР»СЋС‡ РЅРµ РїСѓСЃС‚РѕР№, РґРѕР±Р°РІР»СЏРµРј Р°РґСЂРµСЃ С…РѕСЃС‚Р°
                 if (validate_ip4(szHostName) > 0)
                 {
-                    // адрес валидный, добавляем
+                    // Р°РґСЂРµСЃ РІР°Р»РёРґРЅС‹Р№, РґРѕР±Р°РІР»СЏРµРј
                     // printf("    - add host at %s\n", szHostName);
                     curIP->next = malloc(sizeof(HOSTNAME));
                     curIP = curIP->next;
@@ -257,27 +257,27 @@ int settime(time_t *newtime)
 
 
 /*
-  запрашивает на hostname текущее время
-  в случае ошибки возвращает ноль,
-  иначе время в секундах от 1 января 1900 года
+  Р·Р°РїСЂР°С€РёРІР°РµС‚ РЅР° hostname С‚РµРєСѓС‰РµРµ РІСЂРµРјСЏ
+  РІ СЃР»СѓС‡Р°Рµ РѕС€РёР±РєРё РІРѕР·РІСЂР°С‰Р°РµС‚ РЅРѕР»СЊ,
+  РёРЅР°С‡Рµ РІСЂРµРјСЏ РІ СЃРµРєСѓРЅРґР°С… РѕС‚ 1 СЏРЅРІР°СЂСЏ 1900 РіРѕРґР°
 */
 time_t ntp_gettime(char *hostname)
 {
-    int ntpPort=123;             // порт NTP сервера
-    DWORD waitRequest = 6000;    // макс. задержка ожидания ответа сервера (мсек)
-    unsigned char sendPkt[48];   // пакет с запросом к серверу NTP
-    unsigned long buf[1024];     // буфер для приёма
+    int ntpPort=123;             // РїРѕСЂС‚ NTP СЃРµСЂРІРµСЂР°
+    DWORD waitRequest = 6000;    // РјР°РєСЃ. Р·Р°РґРµСЂР¶РєР° РѕР¶РёРґР°РЅРёСЏ РѕС‚РІРµС‚Р° СЃРµСЂРІРµСЂР° (РјСЃРµРє)
+    unsigned char sendPkt[48];   // РїР°РєРµС‚ СЃ Р·Р°РїСЂРѕСЃРѕРј Рє СЃРµСЂРІРµСЂСѓ NTP
+    unsigned long buf[1024];     // Р±СѓС„РµСЂ РґР»СЏ РїСЂРёС‘РјР°
     int sockAdrSize;
     struct sockaddr sockAddr;
-    struct sockaddr_in servAddr; // адрес сервера
-    SOCKET hSocket;              // сокет
-    time_t ntpTime;              // полученное от сервера время в сек
+    struct sockaddr_in servAddr; // Р°РґСЂРµСЃ СЃРµСЂРІРµСЂР°
+    SOCKET hSocket;              // СЃРѕРєРµС‚
+    time_t ntpTime;              // РїРѕР»СѓС‡РµРЅРЅРѕРµ РѕС‚ СЃРµСЂРІРµСЂР° РІСЂРµРјСЏ РІ СЃРµРє
 
     memset(&sendPkt, 0, sizeof(sendPkt));
     memset(&buf, 0, sizeof(buf));
     sendPkt[0] = 8;
 
-    // открываем UDP сокет
+    // РѕС‚РєСЂС‹РІР°РµРј UDP СЃРѕРєРµС‚
     hSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (hSocket == INVALID_SOCKET)
     {
@@ -285,12 +285,12 @@ time_t ntp_gettime(char *hostname)
         wsa_error("socket()");
         return 0;
     }
-    // задаём адрес
+    // Р·Р°РґР°С‘Рј Р°РґСЂРµСЃ
     memset(&servAddr, 0, sizeof(servAddr));
     servAddr.sin_family=AF_INET;
     servAddr.sin_addr.s_addr = inet_addr(hostname);
     servAddr.sin_port=htons(ntpPort);
-    // задаём макс. время ожидания ответа
+    // Р·Р°РґР°С‘Рј РјР°РєСЃ. РІСЂРµРјСЏ РѕР¶РёРґР°РЅРёСЏ РѕС‚РІРµС‚Р°
     if (setsockopt(hSocket, SOL_SOCKET, SO_RCVTIMEO, (const char*) &waitRequest, sizeof(DWORD)) == SOCKET_ERROR)
     {
         //
@@ -298,7 +298,7 @@ time_t ntp_gettime(char *hostname)
         closesocket(hSocket);
         return 0;
     }
-    // собственно запрос и ответ
+    // СЃРѕР±СЃС‚РІРµРЅРЅРѕ Р·Р°РїСЂРѕСЃ Рё РѕС‚РІРµС‚
     sockAdrSize = sizeof (sockAddr);
     sendto(hSocket, (const char*) sendPkt, sizeof(sendPkt), 0, (struct sockaddr *) &servAddr, sizeof(servAddr));
 
@@ -308,9 +308,9 @@ time_t ntp_gettime(char *hostname)
         closesocket(hSocket);
         return 0;
     }
-    // получаем время передачи
+    // РїРѕР»СѓС‡Р°РµРј РІСЂРµРјСЏ РїРµСЂРµРґР°С‡Рё
     ntpTime = (time_t) ntohl(buf[4]);
-    // переводим к 1900 году
+    // РїРµСЂРµРІРѕРґРёРј Рє 1900 РіРѕРґСѓ
     ntpTime = (unsigned long) ntpTime - 2208988800U;
 
     closesocket(hSocket);
@@ -319,27 +319,27 @@ time_t ntp_gettime(char *hostname)
 
 
 /*
-  синхронизация времени с сервером NTP
-  если получилось, то возвращает -1, иначе 0
+  СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ РІСЂРµРјРµРЅРё СЃ СЃРµСЂРІРµСЂРѕРј NTP
+  РµСЃР»Рё РїРѕР»СѓС‡РёР»РѕСЃСЊ, С‚Рѕ РІРѕР·РІСЂР°С‰Р°РµС‚ -1, РёРЅР°С‡Рµ 0
 */
 int ntpupdate(char *hostname)
 {
-    time_t srcNtpTime;          // полученное время в сек
-    time_t srcLocTime;          // локальное время в сек
-    struct tm *tmpTime;         // времянка для конвертации времени
+    time_t srcNtpTime;          // РїРѕР»СѓС‡РµРЅРЅРѕРµ РІСЂРµРјСЏ РІ СЃРµРє
+    time_t srcLocTime;          // Р»РѕРєР°Р»СЊРЅРѕРµ РІСЂРµРјСЏ РІ СЃРµРє
+    struct tm *tmpTime;         // РІСЂРµРјСЏРЅРєР° РґР»СЏ РєРѕРЅРІРµСЂС‚Р°С†РёРё РІСЂРµРјРµРЅРё
     struct tm locTime;
     struct tm ntpTime;
 
     printf("- request to server %s\n", hostname);
 
-    // получаем время сервера
+    // РїРѕР»СѓС‡Р°РµРј РІСЂРµРјСЏ СЃРµСЂРІРµСЂР°
     srcNtpTime = ntp_gettime(hostname);
     if (srcNtpTime == 0)
     {
-        // что-то пошло не так
+        // С‡С‚Рѕ-С‚Рѕ РїРѕС€Р»Рѕ РЅРµ С‚Р°Рє
         return 0;
     }
-    // теперь получаем локальное время и переводим в формат TM
+    // С‚РµРїРµСЂСЊ РїРѕР»СѓС‡Р°РµРј Р»РѕРєР°Р»СЊРЅРѕРµ РІСЂРµРјСЏ Рё РїРµСЂРµРІРѕРґРёРј РІ С„РѕСЂРјР°С‚ TM
     time(&srcLocTime);
     tmpTime = localtime (&srcLocTime);
     memcpy(&locTime, tmpTime, sizeof(locTime));
@@ -349,7 +349,7 @@ int ntpupdate(char *hostname)
     printf("  - ntp   time: %u/%u/%u  %02u:%02u:%02u\n",ntpTime.tm_mday,ntpTime.tm_mon+1,ntpTime.tm_year+1900,ntpTime.tm_hour,ntpTime.tm_min,ntpTime.tm_sec);
     printf("  - local time: %u/%u/%u  %02u:%02u:%02u\n",locTime.tm_mday,locTime.tm_mon+1,locTime.tm_year+1900,locTime.tm_hour,locTime.tm_min,locTime.tm_sec);
 
-    // сравниваем и если что, то корректируем местное время,
+    // СЃСЂР°РІРЅРёРІР°РµРј Рё РµСЃР»Рё С‡С‚Рѕ, С‚Рѕ РєРѕСЂСЂРµРєС‚РёСЂСѓРµРј РјРµСЃС‚РЅРѕРµ РІСЂРµРјСЏ,
     if (diffTime > 0)
     {
         if (abs(srcNtpTime - srcLocTime) >= diffTime)
@@ -367,7 +367,7 @@ int ntpupdate(char *hostname)
 
 
 /*
-  синхронизация времени со всеми возможными NTP-серверами.
+  СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ РІСЂРµРјРµРЅРё СЃРѕ РІСЃРµРјРё РІРѕР·РјРѕР¶РЅС‹РјРё NTP-СЃРµСЂРІРµСЂР°РјРё.
 */
 int do_time(void)
 {
@@ -378,7 +378,7 @@ int do_time(void)
     while (host)
     {
         if (ntpupdate(&host->name) != 0)
-            return 0;                       // получилось, уходим
+            return 0;                       // РїРѕР»СѓС‡РёР»РѕСЃСЊ, СѓС…РѕРґРёРј
         host = host->next;
     }
     printf("ERROR: can't connect to NTP servers!\n");
